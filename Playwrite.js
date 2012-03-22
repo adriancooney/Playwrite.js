@@ -1,4 +1,11 @@
 /**
+ *    ____  __                          _ __           _     
+ *    / __ \/ /___ ___  ___      _______(_) /____      (_)____
+ *   / /_/ / / __ `/ / / / | /| / / ___/ / __/ _ \    / / ___/
+ *  / ____/ / /_/ / /_/ /| |/ |/ / /  / / /_/  __/   / (__  ) 
+ * /_/   /_/\__,_/\__, / |__/|__/_/  /_/\__/\___(_)_/ /____/  
+ *               /____/                          /___/        
+ *
  * 	Welcome to the Playwrite.js source code.
  * 	I hope you have an enjoyable stay.
  * 	
@@ -231,25 +238,33 @@ var Playwrite = PW = {
 			 * } )( function() { create("block"); } ));
 			 *
 			 * I've hit a road block. Each function I send is being evaluated on the spot (as Javascript should do)
-			 * so I'm finding it hard to get find a solution to return the _function_
+			 * so I'm finding it hard to get find a solution to return the _function_, and not any evaluated function
+			 * i.e. a value. I may have to resort to converting them to strings, but hopefully this fix will only be
+			 * temporary. People just don't seem to like eval();
+			 * 
+			 * Eval will not even be a temporary fix. Things like addEventListener overrides any parameters given to it
+			 * rendering any further function useless. What I was originally planning to do was bunch all the callbacks
+			 * into an array, and send this array as a parameter to each function. I would then implement some sort 
+			 * of levelling system where the function would know which callback to take. However, as I said earlier,
+			 * addEventListener will override any given callbacks therefore rendering any functions afterwards useless.
+			 * Emphasis on temporary because I know the above would be disgusting.
+			 *
+			 * Why is this so damn hard to do?
+			 * Here is the problem:
+			 *   f(f(f(f)))
+			 * 	  ^^^
+			 * The above is a skinned down example. What I want to do is pass each function as a parameter but there are
+			 * evaluation as I compile (as shown beautifully above). Sure the top level function  is being sent as a 
+			 * parameter is being sent but the rest are jsut values. I need to find someway to push the functions as
+			 * parameters to their parent function.
 			 */
+
 			//Take the data and compile the command and return it
 			this.compile = function() {
 				var that = this;
 				this.command.forEach(function(clbk, i) {
-					if(i === 0) {
-						//First iteration, create the highest level block
-						func = function() {
-							clbk.call(PW);
-						};
-					} else {
-						//iterate through the functions
-						func = function() {
-							v.call(PW, func);
-						};
-					}
-				});
-				return func;
+					
+				};
 			};
 
 			//Push to the param object
