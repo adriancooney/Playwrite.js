@@ -1,10 +1,10 @@
 /**
- *    ____  __                          _ __           _     
- *    / __ \/ /___ ___  ___      _______(_) /____      (_)____
- *   / /_/ / / __ `/ / / / | /| / / ___/ / __/ _ \    / / ___/
- *  / ____/ / /_/ / /_/ /| |/ |/ / /  / / /_/  __/   / (__  ) 
- * /_/   /_/\__,_/\__, / |__/|__/_/  /_/\__/\___(_)_/ /____/  
- *               /____/                          /___/        
+ *	    ____  __                          _ __           _     
+ *	    / __ \/ /___ ___  ___      _______(_) /____      (_)____
+ *	   / /_/ / / __ `/ / / / | /| / / ___/ / __/ _ \    / / ___/
+ *	  / ____/ / /_/ / /_/ /| |/ |/ / /  / / /_/  __/   / (__  ) 
+ *	 /_/   /_/\__,_/\__, / |__/|__/_/  /_/\__/\___(_)_/ /____/  
+ *	               /____/                          /___/        
  *
  * 	Welcome to the Playwrite.js source code.
  * 	I hope you have an enjoyable stay.
@@ -19,20 +19,20 @@
  *	The keyword "when" signifies executing at a specific time i.e. an event. The event is the specified with "load"
  * 	(similiar to my other library, When.js). So this is the wrapper, all the functions after this will go into this event
  * 	(within the scope of the command/sentence) and be called when it is fired. This moves us onto the next word, "create".
- * 	Create on it's own isn't much use but alongside (and before!) the word block, we can deduce that the user wants a <div>/
+ * 	Create on it's own isn't much use but alongside (and before!) the word "block", we can deduce that the user wants a <div>/
  * 	<section> created in the page. We then have dimensions of "10cm" for width and height and a position "center"  in which 
  *	we can send along as parameters to the "create" function. create("block", "10x10", "center"). Of course this could be
- * 	watered down even but that's the overall concept. What I want this library, along with being a learning experience for me,
+ * 	watered down even but that's the overall concept. What I want for this library, along with being a learning experience for me,
  * 	is to be is a bit like Processing. Instant visual feedback from simple language. I really don't think the simplicity of a
- * 	language syntax can go any further than that. And no, I don't expect it to be a learning tool. Moreover a tool for enticing
+ * 	language syntax can go any further than that. And no, I don't expect it to be a learning tool. Moreover, a tool for enticing
  * 	people to learn what's going on behind the scenes.
  *	
- * 	Example as to the way one command's scope is parsed.
+ * 	Example as to the way a command's scope is parsed.
  *	when loads -- Event
  *	└── create -- Function
- *	      ├── color -- Color
- *	      ├── dimensions -- Dimension
- *	      └── shape -- Shape
+ *	      ├── color -- Color [parameter]
+ *	      ├── dimensions -- Dimension [parameter]
+ *	      └── shape -- Shape [parameter]
  *
  * 	
  * 	TODO: Add regex hooks for things like hex color testing
@@ -217,6 +217,7 @@ var Playwrite = PW = {
 			this.command = [];
 			this.params = [];
 			this.length = 0;
+			this.id = Math.floor(Math.random()*Math.pow(10, 9));
 			
 			/**
 			 * Example so I can wrap my head around this
@@ -257,14 +258,41 @@ var Playwrite = PW = {
 			 * evaluation as I compile (as shown beautifully above). Sure the top level function  is being sent as a 
 			 * parameter is being sent but the rest are jsut values. I need to find someway to push the functions as
 			 * parameters to their parent function.
+			 * 
+			 * Actually, I could do with references to the PW object. Store the parameters in it, and thenthe function can
+			 * access them at will. Still have to use eval however. I'm really not liking how this is turning out. C'mon
+			 * Adrian. TODO: GET YOUR SHIT TOGETHER.
+			 *
+			 * Write out, again what I need to do.
+			 * 	Send the _function_ to be executed last as a parameter to the second last function. Send the _function_
+			 * 	to be executed second last as a parameter to the third last function etc.
+			 *		fn = f[n](f[n+1])
+			 *		         ^      ^
+			 * Being executed! How can I possibly do this without converting them to strings? I can not simply return
+			 * the function after executing because the content inside of the function may not have to be called then.
+			 * 
+			 * Let's take a look from the API side:
+			 * SW.addGroup({
+			 *	type: EVENT,
+			 *	keywords: ["loads", "pops up"],
+			 *	exec: function(callback) {
+			 *		document.addEventListener("DOMContentLoaded", function() {
+			 *			callback.call(SW);
+			 *	}
+			 * });
+			 *
+			 * An event only requires a callback. Where did my plans for deeper chains go? My orginal plan was to pass 
+			 * each callback as a parameter but clearly it does NOT work here. And anyway, this is really the only 
+			 * situation where callbacks and nesting functions will arise. A nesting deeper than this is very unlikely
+			 * to occur. However, I _HATE_ this style of coding. Limiting the ability for comprimise. 
 			 */
 
 			//Take the data and compile the command and return it
 			this.compile = function() {
-				var that = this;
+				var that = this, func = "";
 				this.command.forEach(function(clbk, i) {
-					
-				};
+						
+				});
 			};
 
 			//Push to the param object
